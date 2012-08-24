@@ -17,10 +17,7 @@ require "harbor/mail/mailer"
 require "harbor/logging"
 require "harbor/logging/appenders/email"
 require "harbor/test/test"
-require "rack/test"
 require "builder"
-
-ENV['RACK_ENV'] = 'test'
 
 (Harbor::Mail::Builder.private_instance_methods - Object.private_instance_methods).each do |method|
   Harbor::Mail::Builder.send(:public, method)

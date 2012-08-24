@@ -80,7 +80,6 @@ class Harbor
 
   private
 
-  # TODO: Check if we can use Rack::File
   class PublicFiles
     def root=(root)
       @root = root

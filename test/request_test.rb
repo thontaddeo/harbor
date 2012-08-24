@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env jruby
 
 require_relative 'helper'
 
@@ -73,7 +73,7 @@ class RequestTest < MiniTest::Unit::TestCase
   end
 
   def request(path, method, options)
-    Harbor::Request.new(Class.new, Rack::MockRequest.env_for(path, options.merge(:method => method)))
+    Harbor::Request.new(Class.new, options.merge({ "REQUEST_METHOD" => method, "SERVER_NAME" => "example.org", "SERVER_PORT" => "80", "PATH_INFO" => path }))
   end
 
 end

@@ -186,6 +186,35 @@ class Harbor
       end
     end
 
+    # Returns the data received in the request body.
+    #
+    # This method support both application/x-www-form-urlencoded and
+    # multipart/form-data.
+    def POST
+      if @env["rack.input"].nil?
+        raise "Missing rack.input"
+      elsif @env["rack.request.form_input"].eql? @env["rack.input"]
+        @env["rack.request.form_hash"]
+      elsif form_data? || parseable_data?
+        @env["rack.request.form_input"] = @env["rack.input"]
+        unless @env["rack.request.form_hash"] = parse_multipart(env)
+          form_vars = @env["rack.input"].read
+    
+          # Fix for Safari Ajax postings that always append \0
+          # form_vars.sub!(/\0\z/, '') # performance replacement:
+          form_vars.slice!(-1) if form_vars[-1] == ?\0
+    
+          @env["rack.request.form_vars"] = form_vars
+          @env["rack.request.form_hash"] = parse_query(form_vars)
+    
+          @env["rack.input"].rewind
+        end
+        @env["rack.request.form_hash"]
+      else
+        {}
+      end
+    end
+    
     private
 
     def accept_entry(entry)
@@ -198,5 +227,6 @@ class Harbor
     def request_method_in_params?
       @env["REQUEST_METHOD"] == "POST" && self.POST && %w(PUT DELETE).include?((self.POST['_method'] || "").upcase)
     end
+    
   end
 end
